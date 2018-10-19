@@ -33,10 +33,13 @@ from time import sleep
 from rocketchat_API.rocketchat import RocketChat
 from config import *
 
-logging.basicConfig(level=logging.INFO)
+
 logger = logging.getLogger(__name__)
-FORMAT = '%(asctime)-15s %(clientip)s %(user)-8s %(message)s'
-logging.basicConfig(format=FORMAT)
+handler = logging.StreamHandler()
+handler.setFormatter(logging.Formatter('[%(asctime)s %(levelname)s] %(message)s'))
+logger.addHandler(handler)
+logger.setLevel(logging.DEBUG)
+
 
 class RocketChatBot(object):
     def __init__(self, botname, passwd, server):
@@ -153,10 +156,10 @@ class RocketChatBot(object):
 
     def check_poll_messages(self):
         for msg,poll in self.msg_to_poll.items():
-            print("[+] Checking Poll %s" % msg)
+            logger.info("[+] Checking Poll %s" % msg)
             message = bot.api.chat_get_message(msg_id=msg).json()
             if message['message']['reactions'] != poll.reactions:
-                print(message)
+                logger.info(message)
                 poll.reactions = message['message']['reactions']
                 poll.process_reactions(self.botname)
                 updated_message,attachments = poll.create_message()
