@@ -1,12 +1,12 @@
-# rocketchat-pollbot
+# Rocketchat-pollbot
 Pollbot for rocketchat
 
-# requirements
+# Requirements
 - rocketchat-API==0.6.3
 
-# setup
+# Setup
 1. Create a bot user on your rocketchat server.
-2. copy `example.config.py` to `config.py` and set the values as shown:
+2. Copy `example.config.py` to `config.py` and set the values as shown:
 ```
 BOTNAME = "testman"
 PASSWORD = "strong_pw"
@@ -18,6 +18,6 @@ Where `BOTNAME` is the name of your botuser,
 and `SERVER` your rocketchat server.
 
 
-# usage
+# Usage
 To create a poll write:
 `@BOTNAME poll "Do you like cookies" yes no`
