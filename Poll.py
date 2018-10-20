@@ -39,17 +39,18 @@ class Poll(object):
 
     def __init__(self, poll_title, vote_options):
         global POLL_ID
-        self.poll_ID = POLL_ID # some human readable id.
+        self.poll_ID = POLL_ID
         POLL_ID += 1
         self.creation_time = time.time() # timestamp
-
         self.poll_msg = None
         self.creation_msg = None
         self.creator = None
 
         self.poll_title = poll_title # string
+
         # vote_options of the form [op1,op2,op3...]
         self.vote_options = vote_options
+
         # reactions dict is of the form:
         # {':regional_indicator_a:': {'usernames': ['testbot', 'Bree']},
         #  ':regional_indicator_b:': {'usernames': ['testbot']},
@@ -60,15 +61,12 @@ class Poll(object):
         self.option_to_reaction = dict()
         self.reaction_to_option = dict()
 
-        it = 0
-        for option in vote_options:
-            if it in EmojiStorage.NUMBER_TO_LETTEREMOJI:
-                reaction = EmojiStorage.NUMBER_TO_LETTEREMOJI[it]
+        for i, option in enumerate(vote_options):
+            if i in EmojiStorage.NUMBER_TO_LETTEREMOJI:
+                reaction = EmojiStorage.NUMBER_TO_LETTEREMOJI[i]
                 self.option_to_reaction[option] = reaction
                 self.reaction_to_option[reaction] = option
                 self.options_to_users[option] = []
-            it += 1
-        print(self.reaction_to_option)
 
     def process_reactions(self, botname):
         tmp = {key: [] for key in self.options_to_users}
@@ -100,7 +98,7 @@ class Poll(object):
         :return:
         """
 
-        attachments = [{"title": self.poll_title, "color": "#ff6644", 'collapsed': False}]
+        attachments = {"title": self.poll_title, "color": "#ff6644", 'collapsed': False}
         msg = "*%s* \n" % (self.poll_title)
         text = ""
         for option, users in self.options_to_users.items():
@@ -118,5 +116,5 @@ class Poll(object):
             msg += "*%s %s [%d]* \n %s \n " % (reaction, option,total,user_string)
             text += "*%s %s [%d]* \n %s \n " % (reaction, option,total,user_string)
 
-        attachments[0]['text'] = text
-        return msg,attachments
+        attachments['text'] = text
+        return msg, [attachments]

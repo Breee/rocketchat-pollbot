@@ -25,22 +25,6 @@ SOFTWARE.
 class EmojiStorage(object):
 
     def __init__(self):
-        # Dictionary that maps the numblock emojis to a number.
-        self.EMOJI_TO_NUMBER = {
-            "\U00000031\U000020E3": 0,
-            "\U00000032\U000020E3": 1,
-            "\U00000033\U000020E3": 2,
-            "\U00000034\U000020E3": 3,
-            "\U00000035\U000020E3": 4,
-            "\U00000036\U000020E3": 5,
-            "\U00000037\U000020E3": 6,
-            "\U00000038\U000020E3": 7,
-            "\U00000039\U000020E3": 8,
-            "\U0001F51F": 9
-            }
-
-        # Reverse of EMOJI_TO_NUMBER
-        self.NUMBER_TO_EMOJI = {val: key for key, val in self.EMOJI_TO_NUMBER.items()}
 
         """
         :regional_indicator_a:  \U0001F1E6

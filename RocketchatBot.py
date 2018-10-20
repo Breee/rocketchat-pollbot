@@ -26,12 +26,10 @@ SOFTWARE.
 """
 
 import logging
-from Poll import *
 from random import choice
 from threading import Thread
 from time import sleep
 from rocketchat_API.rocketchat import RocketChat
-from config import *
 
 
 logger = logging.getLogger(__name__)
@@ -50,9 +48,6 @@ class RocketChatBot(object):
         self.direct_answers = []
         self.unknow_command = ['command not found', ]
         self.lastts = {}
-        self.polls = dict()
-        self.msg_to_poll = dict()
-        self.add_dm_handler(['poll'], self.poll)
 
     def echo(self, msg, user, channel_id):
         self.send_message('@' + user + ' : ' + msg, channel_id)
@@ -154,18 +149,6 @@ class RocketChatBot(object):
         self.process_messages(self.api.im_hdistory(channel_id, oldest=self.lastts[channel_id]).json(),
                               channel_id)
 
-    def check_poll_messages(self):
-        for msg,poll in self.msg_to_poll.items():
-            logger.info("[+] Checking Poll %s" % msg)
-            message = bot.api.chat_get_message(msg_id=msg).json()
-            if message['message']['reactions'] != poll.reactions:
-                logger.info(message)
-                poll.reactions = message['message']['reactions']
-                poll.process_reactions(self.botname)
-                updated_message,attachments = poll.create_message()
-                self.api.chat_update(room_id=message['message']['rid'],msg_id=poll.poll_msg,text=updated_message, attachments=attachments)
-
-
     def run(self):
         for channel in self.api.channels_list_joined().json().get('channels'):
             self.load_channel_ts(channel.get('_id'))
@@ -173,32 +156,4 @@ class RocketChatBot(object):
         while 1:
             for channel in self.api.channels_list_joined().json().get('channels'):
                 Thread(target=self.process_channel, args=(channel.get('_id'),)).start()
-                Thread(target=self.check_poll_messages).start()
             sleep(1)
-
-    def create_poll(self, channel_id, poll_args):
-        if len(poll_args) < 2:
-            usage = "Error, usage: @botname poll <poll_title> <option_1> .. <option_10>"
-            self.send_message(msg=usage, channel_id=channel_id)
-            return
-        title = poll_args[0]
-        vote_options = poll_args[1:]
-        poll = Poll(poll_title=title, vote_options=vote_options)
-        message,attachments = poll.create_message()
-        callback = self.send_message(msg=message, channel_id=channel_id,attachments=None).json()
-        poll.poll_msg = callback['message']['_id']
-        for reaction, option in poll.reaction_to_option.items():
-            self.api.chat_react(msg_id=poll.poll_msg, emoji=reaction)
-        self.msg_to_poll[poll.poll_msg] = poll
-        return poll
-
-    def poll(self, msg, user, channel_id):
-        args = msg.strip().split(' ')
-        poll = self.create_poll(channel_id, args)
-
-
-botname = BOTNAME
-botpassword = PASSWORD
-server_url = SERVER
-bot = RocketChatBot(botname, botpassword, server_url)
-bot.run()
