@@ -23,11 +23,13 @@ SOFTWARE.
 """
 
 import logging
+import copy
 from Poll import *
 from threading import Thread
 from time import sleep
 from RocketchatBot import RocketChatBot
 from emojistorage import *
+
 
 logger = logging.getLogger(__name__)
 handler = logging.StreamHandler()
@@ -58,7 +60,7 @@ class PollBot(RocketChatBot):
                     return
                 elif message['message']['reactions'] != poll.reactions:
                     logger.info("REACTIONS CHANGED FOR MESSAGE:\n %s" % message)
-                    poll.reactions = message['message']['reactions']
+                    poll.reactions = self.preprocess_reactions(message['message']['reactions'])
                     poll.process_reactions(self.botname)
                     updated_message,attachments = poll.create_message()
                     self.api.chat_update(room_id=message['message']['rid'], msg_id=poll.poll_msg,text=updated_message, attachments=attachments)
@@ -67,6 +69,23 @@ class PollBot(RocketChatBot):
                 deleted_messages.append(msg)
         for msg in deleted_messages:
             self.msg_to_poll.pop(msg, None)
+
+    def preprocess_reactions(self, reactions):
+        """
+        Function to replace usernames (e.g. @bree) in reactions with the name set in rocketchat(e.g. bree123).
+        """
+        reactions_copy = copy.deepcopy(reactions)
+        for reaction, userdict in reactions.items():
+            users = userdict['usernames']
+            for user in users:
+                if user != self.botname:
+                    userinfo = self.api.users_info(username=user).json()
+                    user_name = userinfo['user']['name']
+                    if user != user_name:
+                        if user in reactions_copy[reaction]['usernames']:
+                            reactions_copy[reaction]['usernames'].remove(user)
+                            reactions_copy[reaction]['usernames'].append(user_name)
+        return reactions_copy
 
     def run(self):
         for channel in self.api.channels_list_joined().json().get('channels'):
