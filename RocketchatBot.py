@@ -31,7 +31,6 @@ from threading import Thread
 from time import sleep
 from rocketchat_API.rocketchat import RocketChat
 
-
 logger = logging.getLogger(__name__)
 handler = logging.StreamHandler()
 handler.setFormatter(logging.Formatter('[%(asctime)s %(levelname)s] %(message)s'))
@@ -42,14 +41,14 @@ logger.setLevel(logging.DEBUG)
 class RocketChatBot(object):
     def __init__(self, botname, passwd, server):
         self.botname = botname
-        self.api = RocketChat(botname, passwd, server, ssl_verify=False)
+        self.api = RocketChat(botname, passwd, server, ssl_verify=True)
         self.commands = [(['echo', ], self.echo)]
         self.auto_answers = []
         self.direct_answers = []
         self.unknow_command = ['command not found', ]
         self.lastts = {}
 
-    def echo(self, msg, user, channel_id):
+    def echo(self,msg_id, msg, user, channel_id):
         self.send_message('@' + user + ' : ' + msg, channel_id)
 
     def get_status(self, user):
@@ -76,7 +75,7 @@ class RocketChatBot(object):
             user = message['u']['username']
             for cmd_list in self.commands:
                 if command.lower() in cmd_list[0]:
-                    cmd_list[1](arguments, user, channel_id)
+                    cmd_list[1](message['_id'], arguments, user, channel_id)
                     return
 
             if not self.handle_auto_answer(message, self.direct_answers, channel_id):
