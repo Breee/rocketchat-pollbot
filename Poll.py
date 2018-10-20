@@ -81,6 +81,13 @@ class Poll(object):
                         if user not in self.user_to_amount:
                             self.user_to_amount[user] = 1
                         self.options_to_users[option].append(user)
+            elif reaction in EmojiStorage.DEFAULT_PEOPLE_EMOJI_TO_NUMBER:
+                for user in users:
+                    if user != botname:
+                        if user not in self.user_to_amount:
+                            self.user_to_amount[user] = EmojiStorage.DEFAULT_PEOPLE_EMOJI_TO_NUMBER[reaction]
+                        else:
+                            self.user_to_amount[user] += EmojiStorage.DEFAULT_PEOPLE_EMOJI_TO_NUMBER[reaction]
 
 
     def create_message(self):

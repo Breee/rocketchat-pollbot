@@ -27,7 +27,7 @@ from Poll import *
 from threading import Thread
 from time import sleep
 from RocketchatBot import RocketChatBot
-from config import *
+from emojistorage import *
 
 
 logger = logging.getLogger(__name__)
@@ -67,9 +67,11 @@ class PollBot(RocketChatBot):
             sleep(1)
 
     def create_poll(self, channel_id, poll_args):
+        logger.info("Creating new poll with arguments %s"  % poll_args)
         if len(poll_args) < 2:
             usage = "Error, usage: @botname poll <poll_title> <option_1> .. <option_10>"
             self.send_message(msg=usage, channel_id=channel_id)
+            logger.info("Not enough arguments provided, aborting poll creation.")
             return
         title = poll_args[0]
         vote_options = poll_args[1:]
@@ -77,8 +79,13 @@ class PollBot(RocketChatBot):
         message,attachments = poll.create_message()
         callback = self.send_message(msg=message, channel_id=channel_id,attachments=None).json()
         poll.poll_msg = callback['message']['_id']
+        # add reaction for each vote_option.
         for reaction, option in poll.reaction_to_option.items():
             self.api.chat_react(msg_id=poll.poll_msg, emoji=reaction)
+        # add +1,+2,+3,+4
+        for reaction in EmojiStorage.DEFAULT_PEOPLE_EMOJI_TO_NUMBER.keys():
+            self.api.chat_react(msg_id=poll.poll_msg, emoji=reaction)
+
         self.msg_to_poll[poll.poll_msg] = poll
         return poll
 
