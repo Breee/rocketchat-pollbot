@@ -20,4 +20,4 @@ and `SERVER` your rocketchat server.
 
 # usage
 To create a poll write:
-@BOTNAME poll "Do you like cookies" yes no
+`@BOTNAME poll "Do you like cookies" yes no`
