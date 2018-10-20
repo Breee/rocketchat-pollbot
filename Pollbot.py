@@ -43,6 +43,7 @@ class PollBot(RocketChatBot):
         self.polls = dict()
         self.msg_to_poll = dict()
         self.commands.append((['poll', ], self.poll))
+        self.commands.append((['help', ], self.help))
 
     def check_poll_messages(self):
         deleted_messages = []
@@ -105,3 +106,8 @@ class PollBot(RocketChatBot):
         args = [z.strip() for z in args.strip().split('"')]
         args = list(filter(None, args))
         self.create_poll(channel_id, args, msg_id)
+
+    def help(self, msg_id, args, user, channel_id):
+        usage = "Usage: `@botname poll <poll_title> <option_1> .. <option_10>`\n" \
+                "For example: `@botname poll mensa 11:30 11:45 12:00`"
+        self.send_message(msg=usage, channel_id=channel_id)
