@@ -84,4 +84,4 @@ class PollBot(RocketChatBot):
 
     def poll(self, msg, user, channel_id):
         args = msg.strip().split(' ')
-        poll = self.create_poll(channel_id, args)
+        self.create_poll(channel_id, args)
