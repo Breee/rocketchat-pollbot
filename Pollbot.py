@@ -43,11 +43,11 @@ class PollBot(RocketChatBot):
         super().__init__(botname,password,server)
         self.polls = dict()
         self.msg_to_poll = dict()
-        self.add_dm_handler(['poll'], self.poll)
+        self.commands.append((['poll', ], self.poll))
 
     def check_poll_messages(self):
         for msg,poll in self.msg_to_poll.items():
-            logger.info("[+] Checking Poll %s" % msg)
+            logger.info("Checking Poll %s" % msg)
             message = self.api.chat_get_message(msg_id=msg).json()
             if message['message']['reactions'] != poll.reactions:
                 logger.info("REACTIONS CHANGED FOR MESSAGE:\n %s" % message)
@@ -90,5 +90,7 @@ class PollBot(RocketChatBot):
         return poll
 
     def poll(self, msg, user, channel_id):
-        args = msg.strip().split(' ')
+        x = msg
+        args = [z.strip() for z in x.strip().split('"')]
+        args = list(filter(None, args))
         self.create_poll(channel_id, args)
