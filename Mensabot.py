@@ -25,7 +25,7 @@ SOFTWARE.
 import logging
 from Pollbot import PollBot
 import urllib.request, json
-from config import MENSA_CACHE_URL
+from config import MENSA_CACHE_URL, MENSA_NAMES
 
 logger = logging.getLogger(__name__)
 handler = logging.StreamHandler()
@@ -46,7 +46,7 @@ class MensaBot(PollBot):
         with urllib.request.urlopen(MENSA_CACHE_URL) as url:
             data = json.loads(url.read().decode())
 
-        usage = "Usage: `@BOTNAME [food | essen] [Flugplatz | Rempartstrasse | Institutsviertel]`"
+        usage = "Usage: `@BOTNAME [food | essen] %s`" % MENSA_NAMES
         if not args:
             self.send_message(msg=usage, channel_id=channel_id)
         else:
