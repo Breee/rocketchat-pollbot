@@ -29,7 +29,7 @@ from threading import Thread
 from time import sleep
 from RocketchatBot import RocketChatBot
 from emojistorage import *
-
+import shlex
 
 logger = logging.getLogger(__name__)
 handler = logging.StreamHandler()
@@ -122,7 +122,7 @@ class PollBot(RocketChatBot):
         return poll
 
     def poll(self, msg_id, args, user, channel_id):
-        args = [z.strip() for z in args.strip().split('"')]
+        args = shlex.split(args)
         args = list(filter(None, args))
         self.create_poll(channel_id, args, msg_id)
 
