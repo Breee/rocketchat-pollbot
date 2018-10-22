@@ -106,7 +106,7 @@ class Poll(object):
         """
 
         attachments = {"title": self.poll_title, "color": "#ff6644", 'collapsed': False}
-        msg = "*%s* \n" % (self.poll_title)
+        msg = "*%s* \n\n" % (self.poll_title)
         text = ""
         for option, users in self.options_to_users.items():
             reaction = self.option_to_reaction[option]
@@ -120,8 +120,8 @@ class Poll(object):
                 if i < len(users)-1:
                     user_string += ", "
 
-            msg += "*%s %s [%d]* \n %s \n " % (reaction, option,total,user_string)
-            text += "*%s %s [%d]* \n %s \n " % (reaction, option,total,user_string)
+            msg += "*%s %s [%d]* \n\n %s \n\n " % (reaction, option,total,user_string)
+            text += "*%s %s [%d]* \n\n %s \n\n " % (reaction, option,total,user_string)
 
         attachments['text'] = text
         return msg, [attachments]
