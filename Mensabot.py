@@ -25,7 +25,7 @@ SOFTWARE.
 import logging
 from Pollbot import PollBot
 import urllib.request, json
-from config import MENSA_CACHE_URL, MENSA_NAMES
+from config import MENSA_CACHE_URL, MENSA_NAMES, DEFAULT_MENSA
 
 logger = logging.getLogger(__name__)
 handler = logging.StreamHandler()
@@ -42,6 +42,9 @@ class MensaBot(PollBot):
 
 
     def food(self, msg_id, args, user, channel_id):
+
+        if not args:
+            args = DEFAULT_MENSA
 
         with urllib.request.urlopen(MENSA_CACHE_URL) as url:
             data = json.loads(url.read().decode())
