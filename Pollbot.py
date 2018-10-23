@@ -30,6 +30,8 @@ from time import sleep
 from RocketchatBot import RocketChatBot
 from emojistorage import *
 import shlex
+import pickle
+import os
 
 logger = logging.getLogger('bot')
 
@@ -42,6 +44,10 @@ class PollBot(RocketChatBot):
         self.msg_to_poll = dict()
         self.commands.append((['poll', ], self.poll))
         self.commands.append((['help', ], self.help))
+        self.dump_file = 'msg_to_poll.pickle'
+        if os.path.isfile(self.dump_file):
+            msg_to_poll = pickle.load(file=open(self.dump_file, 'rb'))
+            self.msg_to_poll = msg_to_poll
 
     def check_poll_messages(self):
         deleted_messages = []
@@ -113,6 +119,7 @@ class PollBot(RocketChatBot):
             self.api.chat_react(msg_id=poll.poll_msg, emoji=reaction)
 
         self.msg_to_poll[poll.poll_msg] = poll
+        pickle.dump(self.msg_to_poll,file=open(self.dump_file,'wb'))
         return poll
 
     def poll(self, msg_id, args, user, channel_id):
