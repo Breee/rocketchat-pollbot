@@ -31,11 +31,7 @@ from RocketchatBot import RocketChatBot
 from emojistorage import *
 import shlex
 
-logger = logging.getLogger(__name__)
-handler = logging.StreamHandler()
-handler.setFormatter(logging.Formatter('[%(asctime)s %(levelname)s] %(message)s'))
-logger.addHandler(handler)
-logger.setLevel(logging.DEBUG)
+logger = logging.getLogger('bot')
 
 
 class PollBot(RocketChatBot):
@@ -50,7 +46,6 @@ class PollBot(RocketChatBot):
     def check_poll_messages(self):
         deleted_messages = []
         for msg,poll in self.msg_to_poll.items():
-            logger.info("Checking Poll %s" % msg)
             try:
                 message = self.api.chat_get_message(msg_id=msg).json()
                 creation_msg = self.api.chat_get_message(msg_id=poll.creation_msg).json()
@@ -59,7 +54,6 @@ class PollBot(RocketChatBot):
                     deleted_messages.append(msg)
                     return
                 elif message['message']['reactions'] != poll.reactions:
-                    logger.info("REACTIONS CHANGED FOR MESSAGE:\n %s" % message)
                     poll.reactions = self.preprocess_reactions(message['message']['reactions'])
                     poll.process_reactions(self.botname)
                     updated_message,attachments = poll.create_message()

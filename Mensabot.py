@@ -27,12 +27,7 @@ from Pollbot import PollBot
 import urllib.request, json
 from config import MENSA_CACHE_URL, MENSA_NAMES, DEFAULT_MENSA
 
-logger = logging.getLogger(__name__)
-handler = logging.StreamHandler()
-handler.setFormatter(logging.Formatter('[%(asctime)s %(levelname)s] %(message)s'))
-logger.addHandler(handler)
-logger.setLevel(logging.DEBUG)
-
+logger = logging.getLogger('bot')
 
 class MensaBot(PollBot):
 

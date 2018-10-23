@@ -31,11 +31,10 @@ from threading import Thread
 from time import sleep
 from rocketchat_API.rocketchat import RocketChat
 
-logger = logging.getLogger(__name__)
-handler = logging.StreamHandler()
-handler.setFormatter(logging.Formatter('[%(asctime)s %(levelname)s] %(message)s'))
-logger.addHandler(handler)
-logger.setLevel(logging.DEBUG)
+logging.getLogger("requests").setLevel(logging.WARNING)
+logging.getLogger("urllib3").setLevel(logging.WARNING)
+
+logger = logging.getLogger('bot')
 
 
 class RocketChatBot(object):
@@ -94,7 +93,7 @@ class RocketChatBot(object):
     def handle_messages(self, messages, channel_id):
         for message in messages['messages']:
             if message['u']['username'] != self.botname:
-                logger.info(message)
+                #logger.info(message)
                 if message['u']['username'] == 'rocket.cat':
                     continue
                 if message['msg'].startswith('@' + self.botname):
