@@ -41,7 +41,7 @@ class RocketChatBot(object):
     def __init__(self, botname, passwd, server):
         self.botname = botname
         self.api = RocketChat(botname, passwd, server, ssl_verify=True)
-        self.commands = [(['echo', ], self.echo)]
+        self.commands = [(['echo', ], self.echo), (['ping', ], self.ping)]
         self.auto_answers = []
         self.direct_answers = []
         self.unknow_command = ['command not found', ]
@@ -49,6 +49,9 @@ class RocketChatBot(object):
 
     def echo(self,msg_id, msg, user, channel_id):
         self.send_message('@' + user + ' : ' + msg, channel_id)
+
+    def ping(self,msg_id, msg, user, channel_id):
+        self.send_message('Pong!', channel_id)
 
     def get_status(self, user):
         return self.api.users_get_presence(username=user)
