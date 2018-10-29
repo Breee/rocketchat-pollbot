@@ -82,5 +82,3 @@ class MensaBot(PollBot):
         foodmsg += "```\n"
 
         return foodmsg
-
-print(MensaBot.get_food())

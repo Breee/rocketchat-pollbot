@@ -46,9 +46,11 @@ class PollBot(RocketChatBot):
         self.commands.append((['poll', ], self.poll))
         self.commands.append((['help', ], self.help))
         self.dump_file = 'msg_to_poll.pickle'
+        logger.info("load stored polls")
         if os.path.isfile(self.dump_file):
             msg_to_poll = pickle.load(file=open(self.dump_file, 'rb'))
             self.msg_to_poll = msg_to_poll
+        logger.info("done.")
 
     def check_poll_messages(self):
         deleted_messages = []
