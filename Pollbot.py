@@ -29,6 +29,7 @@ from threading import Thread
 from time import sleep
 from RocketchatBot import RocketChatBot
 from emojistorage import *
+from utils import replace_quotes
 import shlex
 import pickle
 import os
@@ -123,6 +124,7 @@ class PollBot(RocketChatBot):
         return poll
 
     def poll(self, msg_id, args, user, channel_id):
+        args = replace_quotes(args)
         args = shlex.split(args)
         args = list(filter(None, args))
         self.create_poll(channel_id, args, msg_id)
