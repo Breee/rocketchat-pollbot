@@ -52,24 +52,20 @@ class PollBot(RocketChatBot):
             self.msg_to_poll = msg_to_poll
         logger.info("done.")
 
-    def check_poll_messages(self):
+    def check_poll_messages(self, messages):
+        messages = messages.json()
         deleted_messages = []
-        for msg,poll in self.msg_to_poll.items():
-            try:
-                message = self.api.chat_get_message(msg_id=msg).json()
-                creation_msg = self.api.chat_get_message(msg_id=poll.creation_msg).json()
-                if not creation_msg['success']:
-                    self.api.chat_delete(room_id=message['message']['rid'], msg_id=poll.poll_msg)
-                    deleted_messages.append(msg)
-                    return
-                elif message['message']['reactions'] != poll.reactions:
-                    poll.reactions = self.preprocess_reactions(message['message']['reactions'])
+        copy_msg_to_poll = self.msg_to_poll.copy()
+        for msg in messages['messages'][0:100]:
+            id = msg['_id']
+            if id in copy_msg_to_poll:
+                poll = copy_msg_to_poll[id]
+                if msg['reactions'] != poll.reactions:
+                    poll.reactions = self.preprocess_reactions(msg['reactions'])
                     poll.process_reactions(self.botname)
-                    updated_message,attachments = poll.create_message()
-                    self.api.chat_update(room_id=message['message']['rid'], msg_id=poll.poll_msg,text=updated_message, attachments=attachments)
-            except Exception as err:
-                logger.warning(err)
-                deleted_messages.append(msg)
+                    updated_message, attachments = poll.create_message()
+                    self.api.chat_update(room_id=msg['rid'], msg_id=poll.poll_msg, text=updated_message,
+                                         attachments=attachments)
         for msg in deleted_messages:
             self.msg_to_poll.pop(msg, None)
 
@@ -90,6 +86,16 @@ class PollBot(RocketChatBot):
                             reactions_copy[reaction]['usernames'].append(user_name)
         return reactions_copy
 
+    def process_messages(self, messages, channel_id):
+        try:
+            if len(messages['messages']) > 0:
+                self.lastts[channel_id] = messages['messages'][0]['ts']
+            self.handle_messages(messages, channel_id)
+            msgs = self.api.channels_history(channel_id)
+            self.check_poll_messages(messages=msgs)
+        except Exception as e:
+            logger.info(e)
+
     def run(self):
         for channel in self.api.channels_list_joined().json().get('channels'):
             self.load_channel_ts(channel.get('_id'))
@@ -97,8 +103,8 @@ class PollBot(RocketChatBot):
         while 1:
             for channel in self.api.channels_list_joined().json().get('channels'):
                 Thread(target=self.process_channel, args=(channel.get('_id'),)).start()
-                Thread(target=self.check_poll_messages).start()
-            sleep(1)
+                #self.process_channel(channel.get('_id'))
+            sleep(3)
 
     def create_poll(self, channel_id, poll_args, msg_id):
         logger.info("Creating new poll with arguments %s"  % poll_args)

@@ -105,6 +105,7 @@ class RocketChatBot(object):
                     Thread(target=self.handle_auto_answer, args=(message, self.auto_answers, channel_id)).start()
 
     def load_ts(self, channel_id, messages):
+        print(messages)
         if len(messages) > 0:
             self.lastts[channel_id] = messages[0]['ts']
         else:
@@ -147,12 +148,13 @@ class RocketChatBot(object):
         if channel_id not in self.lastts:
             self.lastts[channel_id] = ''
 
-        self.process_messages(self.api.im_hdistory(channel_id, oldest=self.lastts[channel_id]).json(),
+        self.process_messages(self.api.im_history(channel_id, oldest=self.lastts[channel_id]).json(),
                               channel_id)
 
     def run(self):
         for channel in self.api.channels_list_joined().json().get('channels'):
             self.load_channel_ts(channel.get('_id'))
+            self.load_im_ts(channel.get('_id'))
 
         while 1:
             for channel in self.api.channels_list_joined().json().get('channels'):
