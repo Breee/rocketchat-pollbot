@@ -54,6 +54,7 @@ class PollBot(RocketChatBot):
 
     def check_poll_messages(self, messages):
         messages = messages.json()
+        print(len(messages['messages']))
         deleted_messages = []
         copy_msg_to_poll = self.msg_to_poll.copy()
         for msg in messages['messages'][0:100]:
@@ -91,7 +92,7 @@ class PollBot(RocketChatBot):
             if len(messages['messages']) > 0:
                 self.lastts[channel_id] = messages['messages'][0]['ts']
             self.handle_messages(messages, channel_id)
-            msgs = self.api.channels_history(channel_id)
+            msgs = self.api.channels_history(channel_id, count=1000)
             self.check_poll_messages(messages=msgs)
         except Exception as e:
             logger.info(e)
